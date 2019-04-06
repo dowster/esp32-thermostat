@@ -4,7 +4,12 @@ set(COMPONENT_PRIV_REQUIRES )
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(COMPONENT_SRCS "main.cpp")
-set(COMPONENT_ADD_INCLUDEDIRS "")
+set(COMPONENT_SRCS "Relay.cpp"
+"Schedule.cpp"
+"Temperature.cpp"
+"TemperatureSensor.cpp"
+"Thermostat.cpp")
+
+set(COMPONENT_ADD_INCLUDEDIRS "include")
 
 register_component()

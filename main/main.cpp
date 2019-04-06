@@ -1,14 +1,25 @@
-#include "freertos/FreeRTOS.h"
+extern "C" {
+    #include "freertos/FreeRTOS.h"
 #include "esp_wifi.h"
 #include "esp_system.h"
 #include "esp_event.h"
 #include "esp_event_loop.h"
 #include "nvs_flash.h"
 #include "driver/gpio.h"
+}
+
+#include "Thermostat.h"
+
+#include <string.h>
+
+Thermostat thermostat = Thermostat();
 
 esp_err_t event_handler(void *ctx, system_event_t *event)
 {
     return ESP_OK;
+}
+extern "C" {
+void app_main();
 }
 
 void app_main(void)
@@ -20,13 +31,12 @@ void app_main(void)
     ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
     ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
     ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_STA) );
-    wifi_config_t sta_config = {
-        .sta = {
-            .ssid = CONFIG_ESP_WIFI_SSID,
-            .password = CONFIG_ESP_WIFI_PASSWORD,
-            .bssid_set = false
-        }
-    };
+    wifi_config_t sta_config = { };
+    strcpy((char*)sta_config.sta.ssid, CONFIG_ESP_WIFI_SSID);
+    strcpy((char*)sta_config.sta.password, CONFIG_ESP_WIFI_PASSWORD);
+    sta_config.sta.bssid_set = false;
+
+
     ESP_ERROR_CHECK( esp_wifi_set_config(WIFI_IF_STA, &sta_config) );
     ESP_ERROR_CHECK( esp_wifi_start() );
     ESP_ERROR_CHECK( esp_wifi_connect() );
@@ -38,5 +48,6 @@ void app_main(void)
         level = !level;
         vTaskDelay(300 / portTICK_PERIOD_MS);
     }
-}
 
+    thermostat.setTarget(Temperature(72.0f, Temperature::FARENHEIT));
+}
